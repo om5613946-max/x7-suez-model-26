@@ -35,6 +35,11 @@ table{width:100%;border-collapse:collapse;background:var(--p);font:14px system-u
 .sl{display:inline-block;min-width:120px;margin:8px 8px 0 0;padding:7px 12px;border:1px solid var(--l);border-inline-start:4px solid var(--n2);border-radius:4px;background:var(--bg);font-family:system-ui,sans-serif}
 .sl.offline{border-inline-start-color:var(--g)}.sl small{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--m)}.sl b{font-size:14px}
 .acts{display:flex;gap:8px;flex-wrap:wrap}footer{text-align:center;color:var(--m);font:12px system-ui;padding:20px}
+.nm{flex:1}.tg{font:600 11px system-ui,sans-serif;color:var(--n2);background:var(--c);border-radius:99px;padding:3px 9px;white-space:nowrap}.tg.no{color:var(--m);background:none;border:1px solid var(--l)}
+.sb{display:block;width:100%;text-align:start;background:var(--p);border:1px solid var(--l);border-radius:10px;padding:12px 14px;margin:8px 0;cursor:pointer;color:inherit;font-family:inherit}.sb.on{border:2px solid var(--g);background:#fbf6ea}.sb b{font-size:17px}.sb small{display:block;font:13px/1.4 system-ui,sans-serif;color:var(--m);margin-top:3px}
+.sr{display:flex;gap:10px;padding:8px 14px;border-bottom:1px solid var(--l);font-size:15px}.sr b{flex:none;width:100px;font:600 12px system-ui,sans-serif;color:var(--n2)}
+.pg{height:6px;background:var(--l);border-radius:3px}.pg i{display:block;height:6px;background:var(--g);border-radius:3px}
+.msg{background:var(--c);border-left:4px solid var(--g);padding:10px 12px;border-radius:6px;font:13px system-ui,sans-serif;margin-bottom:12px}
 #pr{display:none}@media print{body>*:not(#pr){display:none!important}#pr{display:block}}
 </style></head>
 <body class="locked">
@@ -46,7 +51,10 @@ table{width:100%;border-collapse:collapse;background:var(--p);font:14px system-u
 <div id="pr"></div>
 <footer>National Interview Coordination Portal · An independent coordination tool, not an official government website.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import {getFirestore,collection,doc,setDoc,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBZfkvz38sNZPXR8SWdER1M4R7JgNmPPVE",authDomain:"mfa-interviews-477df.firebaseapp.com",projectId:"mfa-interviews-477df",storageBucket:"mfa-interviews-477df.firebasestorage.app",messagingSenderId:"1093930837343",appId:"1:1093930837343:web:5eecac29f6219b4e1982ea"}));
 const H='ac263454e42c13cd8f3f1f8c73e9a372c1390dba0f150daa45cdc399b4fc5687';
 const $=s=>document.querySelector(s);
 const sha=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -55,29 +63,51 @@ $('#gf').onsubmit=async e=>{e.preventDefault();let h='';try{h=await sha($('#gp')
 if(h===H){try{sessionStorage.setItem('g',H)}catch(x){}document.body.classList.remove('locked')}else $('#ge').hidden=false};
 const W=['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'];
 const D={online:W,offline:W.slice(0,6)},L={online:'Online Interviews',offline:'Offline Interviews'};
-const S={online:{Saturday:['Mayar Ahmed','Mostafa Reda','Roqaia','Nadia'],Sunday:['Mohamed Ramzy','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Roqaia','Nadia'],Monday:['Mohamed Ramzy','Mayar Ahmed'],Tuesday:['Mohamed Ramzy','Mayar Ahmed','Sama Mohamed'],Wednesday:['Mayar Ahmed','Sama Mohamed'],Thursday:['Habiba Ahmed','Anas Mohamed','Roqaia','Mariam El-Husseiny','Nada Haitham'],Friday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Mariam El-Husseiny','Ziad','Nada Haitham','Nadia']},
-offline:{Saturday:['Sama Mohamed'],Sunday:['Habiba Ahmed','Mariam El-Husseiny','Nada Haitham'],Monday:['Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Ziad El-Menhy','Nada Haitham','Sama Mohamed'],Tuesday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Ziad El-Menhy','Roqaia','Nada Haitham','Nadia'],Wednesday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Mariam El-Husseiny','Ziad','Nada Haitham','Nadia'],Thursday:['Mohamed Ramzy','Mayar Ahmed','Ziad']}};
+const S={online:{Saturday:['Mayar Ahmed','Mostafa Reda','Roqaia','Nadia'],Sunday:['Mohamed Ramzy','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Roqaia','Nadia','Mariam El-Husseiny','Ziad El-Menhy'],Monday:['Mohamed Ramzy','Mayar Ahmed'],Tuesday:['Mohamed Ramzy','Mayar Ahmed','Sama Mohamed'],Wednesday:['Mayar Ahmed','Sama Mohamed','Mariam El-Husseiny','Ziad El-Menhy'],Thursday:['Habiba Ahmed','Anas Mohamed','Roqaia','Nada Haitham'],Friday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Ziad','Nada Haitham','Nadia']},
+offline:{Saturday:['Sama Mohamed'],Sunday:['Habiba Ahmed','Nada Haitham'],Monday:['Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Ziad El-Menhy','Nada Haitham','Sama Mohamed','Mariam El-Husseiny'],Tuesday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Ziad El-Menhy','Roqaia','Nada Haitham','Nadia','Mariam El-Husseiny'],Wednesday:['Mohamed Ramzy','Mayar Ahmed','Habiba Ahmed','Anas Mohamed','Mostafa Reda','Ziad','Nada Haitham','Nadia'],Thursday:['Mohamed Ramzy','Mayar Ahmed','Ziad']}};
 let view='overview';
+const SL=[['09-11','09:00 – 11:00'],['11-13','11:00 – 13:00'],['13-15','13:00 – 15:00'],['15-17','15:00 – 17:00']];
+const PH={"Anas Mohamed": "963645e8a2c55fb7afb87b02159fd844a09851ccb78e2daf91dec87412fb188e", "Habiba Ahmed": "cf2796e39aa5d819ff616aef7021fdb3a9d817f414905cf122605214daa51297", "Mariam El-Husseiny": "ce4fdd67764673cebb4c454fa8b61b65b80c03d097e0ca5b49c86de562fef8bf", "Mayar Ahmed": "71d5b12b669c8ee28c6591c2c8417cbc98c06b45834ae4b279184c99276ffd5c", "Mohamed Ramzy": "56de54018a9954a54354c699ba785e93ff52a93c9daefa03c87c35471ce1c7e5", "Mostafa Reda": "0050e2ce0e003b56c75142345623cc6c277c4466be887606dc2ac457497a316e", "Nada Haitham": "5bb011a641e547869ae4d9a0ded042c9c057a174ea1e811b6f3fc4727481cb6a", "Nadia": "8779aed488705eec09ee6e506a6edb028437b1e6481646ee3473772c2ef27531", "Roqaia": "278a211b844493e4574351d38f3c009e616a5e0899b7e10db981d54ce47a4b89", "Sama Mohamed": "cd2e55ec92b8212cbb591b76846479cafed400c245e7e7ae3337424be569e7e0", "Ziad": "212ed258ba65abd57db9694f98b6f1f83fd0d318f1dabeda622be928386062da", "Ziad El-Menhy": "f3ff0ad4a0b95d7dda04f2cf2ad0fbb544228424be272ff6d0ecf39e997e4a08"};
+let C={},live=false,err='',me='';try{me=sessionStorage.getItem('me')||''}catch(x){}
+const NAMES=[...new Set([...Object.values(S.online),...Object.values(S.offline)].flat())].sort();
+const lab=s=>(SL.find(x=>x[0]==s)||[0,'?'])[1];
+const ck=(k,d,n)=>k+'|'+d+'|'+n;
+const nice=k=>k=='online'?'Online':'Offline';
+const tag=(k,d,n)=>{const c=C[ck(k,d,n)];return c?`<span class="tg">${lab(c.s)}</span>`:'<span class="tg no">Not yet</span>'};
+const who=(k,d,s)=>S[k][d].filter(n=>C[ck(k,d,n)]&&C[ck(k,d,n)].s==s).sort((a,b)=>C[ck(k,d,a)].t-C[ck(k,d,b)].t);
+const pairs=p=>{const r=[];for(const k of['online','offline'])for(const d of D[k])if(S[k][d].includes(p))r.push([k,d]);return r.sort((a,b)=>W.indexOf(a[1])-W.indexOf(b[1]))};
+const em=()=>err?`<div class="msg">${esc(err)}</div>`:(live?'':'<div class="msg">Loading selections…</div>');
+const sel=()=>{if(!me)return `<h2>Select Times</h2><div class="card" style="padding:16px;max-width:420px"><p style="margin:0 0 10px">Choose your name and enter your personal code.</p><select id="ln" aria-label="Your name">${NAMES.map(n=>`<option>${esc(n)}</option>`).join('')}</select><input id="lp" type="password" inputmode="numeric" placeholder="4-digit code" aria-label="Personal code" style="margin-top:8px"><p id="le" hidden style="color:#a8322b;margin:8px 0 0">Incorrect code.</p><button class="b pri" data-a="login" style="width:100%;margin-top:10px">Continue</button></div>`;
+return `<h2>Select Times</h2><div class="msg">Signed in as <b>${esc(me)}</b> &nbsp; <button class="b" data-a="logout">Switch</button></div>${em()}`+pairs(me).map(([k,d])=>{const mine=C[ck(k,d,me)];return `<article class="card" style="margin-bottom:12px"><header><h3>${d} · ${nice(k)}</h3><span>${mine?'Chosen':'Not chosen yet'}</span></header><div style="padding:6px 14px 10px">${SL.map(([s,t])=>{const w=who(k,d,s),on=mine&&mine.s==s;return `<button class="sb${on?' on':''}" aria-pressed="${!!on}" data-a="pick" data-k="${k}" data-d="${d}" data-s="${s}"><b>${t}</b><small>${w.length?w.length+' selected: '+w.map(n=>esc(n)+(n==me?' (you)':'')).join(', '):'No one yet'}</small></button>`}).join('')}</div></article>`}).join('')};
+const board=()=>{const f=$('#f').value;let ch=0,all=0;const cards=[];
+for(const k of['online','offline']){if(f!='all'&&f!=k)continue;for(const d of D[k]){const a=S[k][d];if(!a.length)continue;const done=a.filter(n=>C[ck(k,d,n)]),pend=a.filter(n=>!C[ck(k,d,n)]);ch+=done.length;all+=a.length;
+cards.push(`<article class="card"><header><h3>${d} · ${nice(k)}</h3><span>${done.length}/${a.length} chosen</span></header>${SL.map(([s,t])=>{const w=who(k,d,s);return `<div class="sr"><b>${t}</b><span dir="auto">${w.length?w.map(esc).join(', '):'—'}</span></div>`}).join('')}<div class="sr"><b>Not yet chosen</b><span dir="auto">${pend.length?pend.map(esc).join(', '):'Everyone has chosen'}</span></div></article>`)}}
+return `<h2>Time Selections</h2>${em()}<div class="msg">${ch} of ${all} chosen</div><div class="pg"><i style="width:${all?Math.round(100*ch/all):0}%"></i></div><div class="grid" style="margin-top:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${cards.join('')}</div>`};
+const selRows=()=>['online','offline'].flatMap(k=>D[k].flatMap(d=>S[k][d].map(n=>{const c=C[ck(k,d,n)];return [L[k],d,n,c?lab(c.s):'Not yet chosen']})));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const card=(k,d)=>{const a=S[k][d],n=a.length;return `<article class="card"><header><h3>${d}</h3><span>${n} interviewer${n==1?'':'s'}</span></header>`+(n?`<ol>${a.map(x=>`<li dir="auto">${esc(x)}</li>`).join('')}</ol>`:'<p style="margin:12px 14px;color:var(--m)">No interviewers assigned.</p>')+'</article>'};
+const card=(k,d)=>{const a=S[k][d],n=a.length;return `<article class="card"><header><h3>${d}</h3><span>${n} interviewer${n==1?'':'s'}</span></header>`+(n?`<ol>${a.map(x=>`<li><span class="nm" dir="auto">${esc(x)}</span>${tag(k,d,x)}</li>`).join('')}</ol>`:'<p style="margin:12px 14px;color:var(--m)">No interviewers assigned.</p>')+'</article>'};
 const sched=k=>`<h2>${L[k]}</h2><div class="grid">${D[k].map(d=>card(k,d)).join('')}</div>`;
 const tot=k=>D[k].reduce((s,d)=>s+S[k][d].length,0);
 const over=()=>`<h2>Overview</h2><div class="stats"><div class="st"><b>${tot('online')}</b><span>Online interview slots</span></div><div class="st"><b>${tot('offline')}</b><span>Offline interview slots</span></div><div class="st"><b>${new Set([...Object.values(S.online),...Object.values(S.offline)].flat()).size}</b><span>Unique name entries</span></div></div><table><tr><th>Day</th><th>Online</th><th>Offline</th></tr>${W.map(d=>`<tr><td>${d}</td><td>${S.online[d]?S.online[d].length:'—'}</td><td>${S.offline[d]?S.offline[d].length:'—'}</td></tr>`).join('')}</table><p style="font:12px system-ui;color:var(--m)">Slots count assignments, not unique people. A dash means the day is not part of that schedule.</p>`;
 const share=()=>`<h2>Share &amp; Export</h2><div class="acts"><button class="b pri" data-a="link">Copy Share Link</button><button class="b" data-a="xlsx">Export to Excel</button><button class="b" data-a="csv">Export to CSV</button><button class="b" data-a="print">Print-Friendly Schedule</button></div>`;
 const res=()=>{const q=$('#q').value.trim().toLowerCase(),f=$('#f').value;if(!q&&f=='all')return'';const m={};for(const k of['online','offline']){if(f!='all'&&f!=k)continue;for(const d of D[k])S[k][d].forEach((n,j)=>{if(!q||n.toLowerCase().includes(q))(m[n]=m[n]||[]).push(`<div class="sl ${k}"><small>${k}</small><b>${d}</b><br><span>Position ${j+1}</span></div>`)})}const e=Object.entries(m);return '<h2>Search results</h2>'+(e.length?e.map(([n,t])=>`<div class="res"><b dir="auto" style="font-size:18px">${esc(n)}</b><div>${t.join('')}</div></div>`).join(''):'<p>No matching interviewers.</p>')};
-const T={overview:['OVERVIEW',over],online:['ONLINE INTERVIEWS',()=>sched('online')],offline:['OFFLINE INTERVIEWS',()=>sched('offline')],share:['SHARE &amp; EXPORT',share]};
+const T={overview:['OVERVIEW',over],online:['ONLINE INTERVIEWS',()=>sched('online')],offline:['OFFLINE INTERVIEWS',()=>sched('offline')],select:['SELECT TIMES',sel],board:['SELECTIONS',board],share:['SHARE &amp; EXPORT',share]};
 const render=()=>{$('#nav').innerHTML=Object.entries(T).map(([k,[t]])=>`<button data-v="${k}" class="${k==view?'on':''}">${t}</button>`).join('');$('#v').innerHTML=res()||T[view][1]()};
 const rows=k=>D[k].flatMap(d=>S[k][d].length?S[k][d].map(n=>[d,n]):[[d,'']]);
 const dl=(n,b)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove()};
-document.onclick=e=>{const b=e.target.closest('button');if(!b)return;
+document.onclick=async e=>{const b=e.target.closest('button');if(!b)return;
 if(b.dataset.v){view=b.dataset.v;$('#q').value='';render();return}
 const a=b.dataset.a;
+if(a=='login'){const n=$('#ln').value;let h='';try{h=await sha(n+':'+$('#lp').value.trim())}catch(x){}if(h===PH[n]){me=n;try{sessionStorage.setItem('me',n)}catch(x){}render()}else $('#le').hidden=false;return}
+if(a=='logout'){me='';try{sessionStorage.removeItem('me')}catch(x){}render();return}
+if(a=='pick'){if(!me)return;const k=b.dataset.k,d=b.dataset.d;try{await setDoc(doc(db,'choices',k+'_'+d+'_'+me),{type:k,day:d,person:me,slot:b.dataset.s,at:serverTimestamp()})}catch(x){alert('Could not save your choice ('+(x.code||x.message)+').')}return}
 if(a=='link')navigator.clipboard.writeText(location.href.split('#')[0]).then(()=>alert('Share link copied.'),()=>alert('Copy the address bar link instead.'));
 else if(a=='csv')dl('interview-schedule.csv',new Blob(['\ufeff'+['Type,Day,Interviewer',...['online','offline'].flatMap(k=>rows(k).map(([d,n])=>`${L[k]},${d},"${n}"`))].join('\r\n')],{type:'text/csv'}));
-else if(a=='xlsx'){if(!window.XLSX)return alert('Excel library did not load. Use CSV.');const w=XLSX.utils.book_new();for(const k of['online','offline'])XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Day','Interviewer'],...rows(k)]),L[k]);dl('interview-schedule.xlsx',new Blob([XLSX.write(w,{bookType:'xlsx',type:'array'})]))}
+else if(a=='xlsx'){if(!window.XLSX)return alert('Excel library did not load. Use CSV.');const w=XLSX.utils.book_new();for(const k of['online','offline'])XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Day','Interviewer'],...rows(k)]),L[k]);XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Type','Day','Interviewer','Time slot'],...selRows()]),'Time Selections');dl('interview-schedule.xlsx',new Blob([XLSX.write(w,{bookType:'xlsx',type:'array'})]))}
 else if(a=='print'){$('#pr').innerHTML='<img src="logo.jpg" width="70" alt=""><h1>National Interview Coordination Portal</h1>'+['online','offline'].map(k=>`<h2>${L[k]}</h2><table><tr><th>Day</th><th>Interviewers</th></tr>${D[k].map(d=>`<tr><td>${d}</td><td>${S[k][d].map(esc).join(' · ')||'—'}</td></tr>`).join('')}</table>`).join('');window.print()}};
 $('#q').oninput=$('#f').onchange=render;$('#clr').onclick=()=>{$('#q').value='';$('#f').value='all';render()};
 $('#tr').innerHTML=Array(12).fill('<span dir="rtl">كلية السياسة والاقتصاد - جامعة السويس - نموذج وزارة الخارجية</span>').join('');
+onSnapshot(collection(db,'choices'),q=>{C={};q.forEach(x=>{const v=x.data({serverTimestamps:'estimate'});C[ck(v.type,v.day,v.person)]={s:v.slot,t:v.at&&v.at.toMillis?v.at.toMillis():Date.now()}});live=true;err='';if(!(view=='select'&&!me))render()},e=>{err='Could not load selections ('+(e.code||e.message)+').';render()});
 render();
 </script>
 </body></html>
